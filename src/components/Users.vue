@@ -84,7 +84,32 @@
               </el-form>
             </a-modal>
             <el-button type="danger" size="mini" @click="deleteUser(scope.row.id)">删除</el-button>
-            <el-button type="warning" size="mini">分配角色</el-button>
+            <el-button type="warning" size="mini" @click="showRolesModal(scope.row)">分配角色</el-button>
+            <a-modal
+              title="分配角色"
+              v-model="visibleRoles"
+              @ok="handleRolesOk"
+              @cancel="handleRolesClose"
+              okText="确认"
+              cancelText="取消"
+              width="50%"
+            >
+              <div>
+                <p>当前的用户：{{userInfo.username}}</p>
+                <p>当前的角色：{{userInfo.role_name}}</p>
+                <p>
+                  分配角色:
+                  <el-select v-model="selectedRoleId" placeholder="请选择">
+                    <el-option
+                      v-for="item in rolesList"
+                      :key="item.id"
+                      :label="item.roleName"
+                      :value="item.id"
+                    ></el-option>
+                  </el-select>
+                </p>
+              </div>
+            </a-modal>
           </template>
         </el-table-column>
       </el-table>
@@ -104,7 +129,6 @@
 
 
 <script>
-import { async } from 'q'
 export default {
 	created() {
 		this.getUserList()
@@ -129,6 +153,7 @@ export default {
 			}
 		}
 		return {
+			selectedRoleId: '',
 			//查询到的用户信息
 			editForm: {},
 			//添加用户的表单数据
@@ -217,11 +242,14 @@ export default {
 			total: 0,
 			visible: false,
 			visibleEdit: false,
+			visibleRoles: false,
 			queryInfo: {
 				query: '',
 				pagenum: 1,
 				pagesize: 2
-			}
+			},
+			userInfo: {},
+			rolesList: []
 		}
 	},
 	methods: {
@@ -270,7 +298,7 @@ export default {
 			this.visibleEdit = true
 		},
 		handleOk(e) {
-			console.log(e)
+			/* 	console.log(e) */
 			this.$refs.addFormRef.validate(async vaild => {
 				console.log(vaild)
 				if (vaild) {
@@ -282,8 +310,8 @@ export default {
 					if (res.meta.status == 201) {
 						this.$message.success('添加用户成功了')
 						this.visible = false
-            this.getUserList()
-            	this.$refs.addFormRef.resetFields()
+						this.getUserList()
+						this.$refs.addFormRef.resetFields()
 					} else {
 						this.$message.error('添加用户失败了')
 					}
@@ -346,6 +374,41 @@ export default {
 						message: '已取消删除'
 					})
 				})
+		},
+		async showRolesModal(userInfo) {
+			console.log(userInfo)
+			this.userInfo = userInfo
+			const { data: res } = await this.$http.get('roles')
+			if (res.meta.status == 200) {
+				this.rolesList = res.data
+			} else {
+				return this.$message.error('获取角色列表失败了')
+			}
+			this.visibleRoles = true
+		},
+		async handleRolesOk() {
+			if (!this.selectedRoleId) {
+				return this.$message.error('请选择分配的角色')
+			}
+			const { data: res } = await this.$http.put(
+				`users/${this.userInfo.id}/role`,
+				{
+					rid: this.selectedRoleId
+				}
+			)
+			if (res.meta.status == 200) {
+				this.$message.success('分配角色成功')
+			} else {
+				this.$message.error('分配角色失败')
+			}
+			this.getUserList()
+			this.visibleRoles = false
+			this.selectedRoleId = ''
+			this.userInfo = {}
+		},
+		handleRolesClose() {
+			this.selectedRoleId = ''
+			this.userInfo = {}
 		}
 	}
 }

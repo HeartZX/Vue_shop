@@ -1,9 +1,9 @@
 <template>
   <div class="login_container">
     <div class="login_box">
-      <div class="avatar_box">
+  <!--     <div class="avatar_box">
         <img src="../assets/logo.png" alt />
-      </div>
+      </div> -->
       <el-form ref="loginFormRef" :model="loginForm" label-width="60px" class="form" :rules="rules">
         <el-form-item label="账号" prop="username">
           <el-input v-model="loginForm.username" prefix-icon="iconfont icon-ziyuan1 "></el-input>

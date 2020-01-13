@@ -25,8 +25,8 @@
           <a-breadcrumb-item>
             <router-link to="/home">首页</router-link>
           </a-breadcrumb-item>
-          <a-breadcrumb-item>用户管理</a-breadcrumb-item>
-          <a-breadcrumb-item>用户列表</a-breadcrumb-item>
+          <a-breadcrumb-item></a-breadcrumb-item>
+          <a-breadcrumb-item></a-breadcrumb-item>
         </a-breadcrumb>
         <a-layout-content style="margin: 0 16px">
           <div :style="{ padding: '24px', background: '#fff', minHeight: '100%'}">
@@ -93,7 +93,7 @@ export default {
 
 <style lang="less" scoped>
 #components-layout-demo-side .logo {
-	height: 45px;
+	height: 55px;
 	margin: 16px;
 }
 .logoutBtn {

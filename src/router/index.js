@@ -4,6 +4,15 @@ import Login from '../components/Login.vue'
 import Home from '../components/Home.vue'
 import Welcome from '../components/welcome.vue'
 import Users from '../components/Users.vue'
+import Rights from '../components/Rights.vue'
+import Roles from '../components/Roles.vue'
+import Categories from '../components/goods/Categories.vue'
+import Reports from '../components/test.vue'
+import Params from '../components/goods/Params.vue'
+import GoodsList from '../components/goods/GoodsList.vue'
+import AddGoods from '../components/goods/AddGoods.vue'
+import EditGoods from '../components/goods/EditGoods.vue'
+import Orders from '../components/Orders.vue'
 
 Vue.use(VueRouter)
 
@@ -14,7 +23,19 @@ const routes = [
     path: '/home',
     redirect: '/welcome',
     component: Home,
-    children: [{ path: '/welcome', component: Welcome },{ path: '/users', component: Users }]
+    children: [
+      { path: '/welcome', component: Welcome },
+      { path: '/users', component: Users },
+      { path: '/rights', component: Rights },
+      { path: '/roles', component: Roles },
+      { path: '/categories', component: Categories },
+      { path: '/reports', component: Reports },
+      { path: '/params', component: Params },
+      { path: '/goods', component: GoodsList },
+      { path: '/goods/add', component: AddGoods },
+      { path: '/goods/edit', component: EditGoods },
+      { path: '/orders', component: Orders }
+    ]
   }
 ]
 const router = new VueRouter({
