@@ -31,6 +31,7 @@
       <el-table-column label="操作" min-width="130px">
         <template slot-scope="scope">
           <el-button type="primary" size="mini" @click="showEditAddressModal">查看地址</el-button>
+          <el-button type="primary" size="mini" @click="showInfoModal(scope.row.order_id)">查看详情</el-button>
           <el-button type="success" size="mini" @click="showProgressModal">物流进度</el-button>
         </template>
       </el-table-column>
@@ -80,96 +81,129 @@
       width="50%"
       :footer="null"
     >
-    <el-timeline>
-    <el-timeline-item
-      v-for="(activity, index) in progressInfo"
-      :key="index"
-      :timestamp="activity.time">
-      {{activity.context}}
-    </el-timeline-item>
-  </el-timeline>
-    
+      <el-timeline>
+        <el-timeline-item
+          v-for="(activity, index) in progressInfo"
+          :key="index"
+          :timestamp="activity.time"
+        >{{activity.context}}</el-timeline-item>
+      </el-timeline>
+    </a-modal>
+    <a-modal
+      title="订单详情"
+      v-model="visibleInfo"
+      @ok="handleOkInfo"
+      @cancel="handleCloseInfo"
+      okText="确认"
+      cancelText="取消"
+      width="50%"
+    >
+      <el-form label-width="90px" :model="infoForm">
+        <el-form-item label="订单号:">
+          <span>{{infoForm.order_id}}</span>
+        </el-form-item>
+        <el-form-item label="订单价格">
+          <span>{{infoForm.order_price}}</span>
+        </el-form-item>
+        <el-form-item label="支付方式:">
+
+        </el-form-item>
+      </el-form>
     </a-modal>
   </div>
 </template>
 <script>
 import cityData from '../assets/citydata.js'
 export default {
-	data() {
-		return {
-			orderList: [],
-			addressForm: {
-				provinces: [],
-				detailedAddress: ''
-			},
-			addressFormRules: {
-				provinces: [
-					{
-						required: true,
-						message: '请输入省市区',
-						trigger: 'blur'
-					}
-				],
-				detailedAddress: [
-					{
-						required: true,
-						message: '请输入详细地址',
-						trigger: 'blur'
-					}
-				]
-			},
-            cityData,
-            progressInfo:[],
-			visibleAddress: false,
-			visibleProgress: false,
-			queryInfo: {
-				query: '',
-				pagenum: 1,
-				pagesize: 8
-			},
-			total: 0
-		}
-	},
-	methods: {
-		async getOrderList() {
-			const { data: res } = await this.$http.get('orders', {
-				params: this.queryInfo
-			})
-			if (res.meta.status == 200) {
-				console.log(res)
-				this.total = res.data.total
-				this.orderList = res.data.goods
-			} else {
-				this.$message.error('获取订单列表失败')
-			}
-		},
-		handleCurrentChange(newPage) {
-			this.queryInfo.pagenum = newPage
-			this.getOrderList()
-		},
-		resetOrderList() {},
-		showEditAddressModal() {
-			this.visibleAddress = true
-		},
-		handleOkAddress() {},
-		handleCloseAddress() {
-			this.$refs.addressFormRef.resetFields()
-		},
-		async showProgressModal() {
-			this.visibleProgress = true
-            const { data: res } = await this.$http.get('/kuaidi/1106975712662')
-            if(res.meta.status==200){
-                this.progressInfo=res.data
-                console.log(this.progressInfo)
-
-            }else{
-                this.$message.error('获取物流信息失败')
-            }
-		}
-	},
-	created() {
-		this.getOrderList()
-	}
+  data () {
+    return {
+      orderList: [],
+      infoForm: {},
+      addressForm: {
+        provinces: [],
+        detailedAddress: ''
+      },
+      addressFormRules: {
+        provinces: [
+          {
+            required: true,
+            message: '请输入省市区',
+            trigger: 'blur'
+          }
+        ],
+        detailedAddress: [
+          {
+            required: true,
+            message: '请输入详细地址',
+            trigger: 'blur'
+          }
+        ]
+      },
+      cityData,
+      progressInfo: [],
+      visibleAddress: false,
+      visibleProgress: false,
+      visibleInfo: false,
+      queryInfo: {
+        query: '',
+        pagenum: 1,
+        pagesize: 8
+      },
+      total: 0
+    }
+  },
+  methods: {
+    async getOrderList () {
+      const { data: res } = await this.$http.get('orders', {
+        params: this.queryInfo
+      })
+      if (res.meta.status == 200) {
+        console.log(res)
+        this.total = res.data.total
+        this.orderList = res.data.goods
+      } else {
+        this.$message.error('获取订单列表失败')
+      }
+    },
+    handleCurrentChange (newPage) {
+      this.queryInfo.pagenum = newPage
+      this.getOrderList()
+    },
+    resetOrderList () {},
+    showEditAddressModal () {
+      this.visibleAddress = true
+    },
+    handleOkAddress () {},
+    handleCloseAddress () {
+      this.$refs.addressFormRef.resetFields()
+    },
+    async showProgressModal () {
+      this.visibleProgress = true
+      const { data: res } = await this.$http.get('/kuaidi/1106975712662')
+      if (res.meta.status == 200) {
+        this.progressInfo = res.data
+        console.log(this.progressInfo)
+      } else {
+        this.$message.error('获取物流信息失败')
+      }
+    },
+    async showInfoModal (id) {
+      console.log(id)
+      this.visibleInfo = true
+      const { data: res } = await this.$http.get('orders/' + id)
+      console.log(res)
+      if (res.meta.status == 200) {
+        this.infoForm = res.data
+      } else {
+        this.$message.error('获取订单信息失败')
+      }
+    },
+    handleOkInfo () {},
+    handleCloseInfo () {}
+  },
+  created () {
+    this.getOrderList()
+  }
 }
 </script>
 <style lang="less" scoped>

@@ -2,7 +2,12 @@
   <div class="home">
     <a-layout id="components-layout-demo-side" style="min-height: 100vh">
       <a-layout-sider collapsible v-model="collapsed">
-        <div class="logo" />
+        <div class="logo">
+          <a class="img">
+            <img src="../assets/avatar.png" alt />
+          </a>
+        </div>
+        <div class="welcomeText">欢迎登录</div>
         <a-menu theme="dark" :defaultSelectedKeys="['1']" mode="inline">
           <a-sub-menu v-for="item in menuList" :key="item.id" index="item.id">
             <span slot="title">
@@ -93,8 +98,8 @@ export default {
 
 <style lang="less" scoped>
 #components-layout-demo-side .logo {
-	height: 55px;
-	margin: 16px;
+	height: 80px;
+	margin: 18px;
 }
 .logoutBtn {
 	position: absolute;
@@ -104,5 +109,23 @@ export default {
 }
 .title {
 	padding-left: 10px;
+}
+.img {
+	display: block;
+	width: 80px;
+	height: 80px;
+	margin: 0 auto 10px;
+}
+.img img {
+	width: 100%;
+	height: 100%;
+	border: 4px solid #44576b;
+	box-sizing: border-box;
+	border-radius: 50%;
+}
+.welcomeText {
+  color: #fff;
+  text-align: center;
+  margin-bottom: 20px
 }
 </style>

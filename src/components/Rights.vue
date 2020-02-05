@@ -14,39 +14,33 @@
         </el-table-column>
       </el-table>
     </div>
-    <el-pagination
-  background
-  layout="prev, pager, next"
-  :total=48 :page-size=8>
-</el-pagination>
   </div>
 </template>
 
 <script>
 export default {
-	data() {
-		return {
-			rightsList: []
-		}
-	},
-	created() {
-		this.getRightList()
-	},
-	methods: {
-		async getRightList() {
-			const { data: res } = await this.$http.get('rights/list')
-			console.log(res)
-			if (res.meta.status == 200) {
-				this.rightsList = res.data
-				console.log(this.rightsList)
-			} else {
-				this.$message.error('获取权限列表失败')
-			}
-		}
-	}
+  data () {
+    return {
+      rightsList: []
+    }
+  },
+  created () {
+    this.getRightList()
+  },
+  methods: {
+    async getRightList () {
+      const { data: res } = await this.$http.get('rights/list')
+      console.log(res)
+      if (res.meta.status == 200) {
+        this.rightsList = res.data
+        console.log(this.rightsList)
+      } else {
+        this.$message.error('获取权限列表失败')
+      }
+    }
+  }
 }
 </script>
-
 
 <style lang="less" scoped>
 .rightsTable {

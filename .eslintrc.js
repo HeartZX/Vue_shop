@@ -5,11 +5,11 @@ module.exports = {
     node: true
   },
 
-  extends: ["plugin:vue/essential", "@vue/standard"],
+  extends: ['plugin:vue/essential', '@vue/standard'],
 
   rules: {
     'no-console': 'off',
-    'no-debugger': 'off',
+    'no-debugger': 'off'
   },
 
   parserOptions: {
@@ -20,4 +20,4 @@ module.exports = {
     'plugin:vue/essential',
     '@vue/standard'
   ]
-};
+}

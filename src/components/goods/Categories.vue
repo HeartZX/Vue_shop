@@ -1,6 +1,6 @@
 <template>
   <div>
-	  
+
     <a-row>
       <a-col>
         <a-button type="primary" size="large" style="float:right" @click="showModal">添加分类</a-button>
@@ -90,194 +90,194 @@
 
 <script>
 export default {
-	data() {
-		return {
-			cateList: [],
-			ParentCateList: [],
-			selectedKey: [],
-			visibleEdit: false,
-			queryInfo: {
-				type: 3,
-				pagenum: 1,
-				pagesize: 8
-			},
-			total: 0,
-			visible: false,
-			addForm: {
-				cat_name: '',
-				cat_pid: 0,
-				cat_level: 0
-			},
-			editForm: {},
-			addFormRules: {
-				cat_name: [
-					{
-						required: true,
-						message: '请输入分类名',
-						trigger: 'blur'
-					}
-				]
-			},
-			editFormRules: {
-				cat_name: [
-					{
-						required: true,
-						message: '请输入分类名',
-						trigger: 'blur'
-					}
-				]
-			},
-			cascaderProps: {
-				expandTrigger: 'hover',
-				value: 'cat_id',
-				label: 'cat_name',
-				children: 'children',
-				checkStrictly: true
-			}
-		}
-	},
-	methods: {
-		async getCateList() {
-			const { data: res } = await this.$http.get('categories', {
-				params: this.queryInfo
-			})
-			if (res.meta.status == 200) {
-				console.log(res.data)
-				this.cateList = res.data.result
-				this.total = res.data.total
-			} else {
-				this.$message.error('获取分类失败了')
-			}
-		},
-		async getParentCateList() {
-			const { data: res } = await this.$http.get('categories', {
-				params: { type: 2 }
-			})
-			if (res.meta.status == 200) {
-				console.log(res.data)
-				this.ParentCateList = res.data
-			} else {
-				this.$message.error('获取父级分类失败了')
-			}
-		},
-		handleCurrentChange(newPage) {
-			this.queryInfo.pagenum = newPage
-			this.getCateList()
-		},
-		showModal() {
-			this.getParentCateList()
-			this.visible = true
-			console.log(this.selectedKey)
-		},
-		handleOk() {
-			this.$refs.addFormRef.validate(async vaild => {
-				if (vaild) {
-					const { data: res } = await this.$http.post(
-						'categories',
-						this.addForm
-					)
-					console.log(res)
-					if (res.meta.status == 201) {
-						this.visible = false
-						this.$message.success('添加分类信息成功')
-					} else {
-						return this.$message.error('添加分类信息失败')
-					}
-				} else {
-					return
-				}
-				this.visible = false
-				this.getCateList()
-				this.$refs.addFormRef.resetFields()
-				this.selectedKey = []
-				this.addForm.cat_pid = 0
-				this.addForm.cat_level = 0
-			})
-		},
-		handleClose() {
-			this.$refs.addFormRef.resetFields()
-			this.selectedKey = []
-			this.addForm.cat_pid = 0
-			this.addForm.cat_level = 0
-		},
-		handleChange() {
-			console.log(this.selectedKey)
-			if (this.selectedKey > 0) {
-				this.addForm.cat_pid = this.selectedKey[
-					this.selectedKey.length - 1
-				]
-				this.addForm.cat_level = this.selectedKey.length
-			} else {
-				this.addForm.cat_pid = 0
-				this.addForm.cat_level = 0
-			}
-		},
-		async deleteCate(id) {
-			const result = await this.$confirm(
-				'此操作将永久删除该分类, 是否继续?',
-				'删除分类',
-				{
-					confirmButtonText: '确定',
-					cancelButtonText: '取消',
-					type: 'warning'
-				}
-			)
-				.then(async () => {
-					console.log(id)
-					const { data: res } = await this.$http.delete(
-						'categories/' + id
-					)
-					if (res.meta.status == 200) {
-						this.$message.success('删除分类成功')
-						this.getCateList()
-					} else {
-						return this.$message.error('删除分类失败')
-					}
-				})
-				.catch(() => {
-					this.$message({
-						type: 'info',
-						message: '已取消删除'
-					})
-				})
-		},
-		async showEditModal(id) {
-			const { data: res } = await this.$http.get('categories/' + id)
-			if (res.meta.status == 200) {
-				this.editForm = res.data
-			} else {
-				this.$message.error('获取分类信息失败')
-			}
-			this.visibleEdit = true
-		},
-		handleEditOk() {
-			this.$refs.editFormRef.validate(async vaild => {
-				if (vaild) {
-					const { data: res } = await this.$http.put(
-						'categories/' + this.editForm.cat_id,
-						{
-							cat_name: this.editForm.cat_name
-						}
-					)
-					if (res.meta.status == 200) {
-						this.visibleEdit = false
-						this.getCateList()
-						this.$message.success('更新分类信息成功')
-					} else {
-						return this.$message.error('更新分类信息失败')
-					}
-				} else {
-					return
-				}
-			})
-		},
-		handleEditClose() {
-			this.$refs.editFormRef.resetFields()
-		}
-	},
-	created() {
-		this.getCateList()
-	}
+  data () {
+    return {
+      cateList: [],
+      ParentCateList: [],
+      selectedKey: [],
+      visibleEdit: false,
+      queryInfo: {
+        type: 3,
+        pagenum: 1,
+        pagesize: 8
+      },
+      total: 0,
+      visible: false,
+      addForm: {
+        cat_name: '',
+        cat_pid: 0,
+        cat_level: 0
+      },
+      editForm: {},
+      addFormRules: {
+        cat_name: [
+          {
+            required: true,
+            message: '请输入分类名',
+            trigger: 'blur'
+          }
+        ]
+      },
+      editFormRules: {
+        cat_name: [
+          {
+            required: true,
+            message: '请输入分类名',
+            trigger: 'blur'
+          }
+        ]
+      },
+      cascaderProps: {
+        expandTrigger: 'hover',
+        value: 'cat_id',
+        label: 'cat_name',
+        children: 'children',
+        checkStrictly: true
+      }
+    }
+  },
+  methods: {
+    async getCateList () {
+      const { data: res } = await this.$http.get('categories', {
+        params: this.queryInfo
+      })
+      if (res.meta.status == 200) {
+        console.log(res.data)
+        this.cateList = res.data.result
+        this.total = res.data.total
+      } else {
+        this.$message.error('获取分类失败了')
+      }
+    },
+    async getParentCateList () {
+      const { data: res } = await this.$http.get('categories', {
+        params: { type: 2 }
+      })
+      if (res.meta.status == 200) {
+        console.log(res.data)
+        this.ParentCateList = res.data
+      } else {
+        this.$message.error('获取父级分类失败了')
+      }
+    },
+    handleCurrentChange (newPage) {
+      this.queryInfo.pagenum = newPage
+      this.getCateList()
+    },
+    showModal () {
+      this.getParentCateList()
+      this.visible = true
+      console.log(this.selectedKey)
+    },
+    handleOk () {
+      this.$refs.addFormRef.validate(async vaild => {
+        if (vaild) {
+          const { data: res } = await this.$http.post(
+            'categories',
+            this.addForm
+          )
+          console.log(res)
+          if (res.meta.status == 201) {
+            this.visible = false
+            this.$message.success('添加分类信息成功')
+          } else {
+            return this.$message.error('添加分类信息失败')
+          }
+        } else {
+          return
+        }
+        this.visible = false
+        this.getCateList()
+        this.$refs.addFormRef.resetFields()
+        this.selectedKey = []
+        this.addForm.cat_pid = 0
+        this.addForm.cat_level = 0
+      })
+    },
+    handleClose () {
+      this.$refs.addFormRef.resetFields()
+      this.selectedKey = []
+      this.addForm.cat_pid = 0
+      this.addForm.cat_level = 0
+    },
+    handleChange () {
+      console.log(this.selectedKey)
+      if (this.selectedKey > 0) {
+        this.addForm.cat_pid = this.selectedKey[
+          this.selectedKey.length - 1
+        ]
+        this.addForm.cat_level = this.selectedKey.length
+      } else {
+        this.addForm.cat_pid = 0
+        this.addForm.cat_level = 0
+      }
+    },
+    async deleteCate (id) {
+      const result = await this.$confirm(
+        '此操作将永久删除该分类, 是否继续?',
+        '删除分类',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      )
+        .then(async () => {
+          console.log(id)
+          const { data: res } = await this.$http.delete(
+            'categories/' + id
+          )
+          if (res.meta.status == 200) {
+            this.$message.success('删除分类成功')
+            this.getCateList()
+          } else {
+            return this.$message.error('删除分类失败')
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+    },
+    async showEditModal (id) {
+      const { data: res } = await this.$http.get('categories/' + id)
+      if (res.meta.status == 200) {
+        this.editForm = res.data
+      } else {
+        this.$message.error('获取分类信息失败')
+      }
+      this.visibleEdit = true
+    },
+    handleEditOk () {
+      this.$refs.editFormRef.validate(async vaild => {
+        if (vaild) {
+          const { data: res } = await this.$http.put(
+            'categories/' + this.editForm.cat_id,
+            {
+              cat_name: this.editForm.cat_name
+            }
+          )
+          if (res.meta.status == 200) {
+            this.visibleEdit = false
+            this.getCateList()
+            this.$message.success('更新分类信息成功')
+          } else {
+            return this.$message.error('更新分类信息失败')
+          }
+        } else {
+
+        }
+      })
+    },
+    handleEditClose () {
+      this.$refs.editFormRef.resetFields()
+    }
+  },
+  created () {
+    this.getCateList()
+  }
 }
 </script>
 <style lang="less" scoped>

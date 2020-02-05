@@ -74,200 +74,200 @@
 <script>
 import _ from 'lodash'
 export default {
-	data() {
-		return {
-			editForm: {},
-			currentIndex: 0,
-			cateList: [],
-			manyTableData: [],
-			onlyTableData: [],
-			visiblePreview: false,
-			PreviewPath: '',
-			editFormRules: {
-				goods_name: [
-					{
-						required: true,
-						message: '请输入商品名称',
-						trigger: 'blur'
-					}
-				],
-				goods_price: [
-					{
-						required: true,
-						message: '请输入商品价格',
-						trigger: 'blur'
-					}
-				],
-				goods_weight: [
-					{
-						required: true,
-						message: '请输入商品重量',
-						trigger: 'blur'
-					}
-				],
-				goods_number: [
-					{
-						required: true,
-						message: '请输入商品数量',
-						trigger: 'blur'
-					}
-				]
-            },
-            headersObj: {
-				Authorization: window.sessionStorage.getItem('token')
-			}
-		}
-	},
-	created() {
-		this.getGoodInfo(this.$route.query.id)
-		this.getCateList()
-	},
-	methods: {
-		async getGoodInfo(id) {
-			console.log(id)
-			const { data: res } = await this.$http.get('goods/' + id)
-			if (res.meta.status == 200) {
-				this.editForm = res.data
-				console.log(this.editForm)
-				console.log(this.editForm.goods_cat)
-				this.editForm.goods_cat = this.editForm.goods_cat
-					.split(',')
-					.map(Number)
-			} else {
-				this.$message.error('获取商品息失败')
-			}
-		},
-		async getCateList() {
-			const { data: res } = await this.$http.get('categories')
-			if (res.meta.status == 200) {
-				console.log(res.data)
-				this.cateList = res.data
-				console.log(this.cateList)
-			} else {
-				this.$message.error('获取分类失败了')
-			}
-		},
-		handleChange() {
-			console.log(this.editForm.goods_cat)
-			if (this.editForm.goods_cat.length !== 3) {
-				this.editForm.goods_cat = []
-			}
-		},
-		async tabClicked() {
-			console.log(this.currentIndex)
-			if (this.currentIndex === '1') {
-				const { data: res } = await this.$http.get(
-					`categories/${this.editForm.goods_cat[2]}/attributes`,
-					{
-						params: {
-							sel: 'many'
-						}
-					}
-				)
-				if (res.meta.status == 200) {
-					res.data.forEach(item => {
-						item.attr_vals =
+  data () {
+    return {
+      editForm: {},
+      currentIndex: 0,
+      cateList: [],
+      manyTableData: [],
+      onlyTableData: [],
+      visiblePreview: false,
+      PreviewPath: '',
+      editFormRules: {
+        goods_name: [
+          {
+            required: true,
+            message: '请输入商品名称',
+            trigger: 'blur'
+          }
+        ],
+        goods_price: [
+          {
+            required: true,
+            message: '请输入商品价格',
+            trigger: 'blur'
+          }
+        ],
+        goods_weight: [
+          {
+            required: true,
+            message: '请输入商品重量',
+            trigger: 'blur'
+          }
+        ],
+        goods_number: [
+          {
+            required: true,
+            message: '请输入商品数量',
+            trigger: 'blur'
+          }
+        ]
+      },
+      headersObj: {
+        Authorization: window.sessionStorage.getItem('token')
+      }
+    }
+  },
+  created () {
+    this.getGoodInfo(this.$route.query.id)
+    this.getCateList()
+  },
+  methods: {
+    async getGoodInfo (id) {
+      console.log(id)
+      const { data: res } = await this.$http.get('goods/' + id)
+      if (res.meta.status == 200) {
+        this.editForm = res.data
+        console.log(this.editForm)
+        console.log(this.editForm.goods_cat)
+        this.editForm.goods_cat = this.editForm.goods_cat
+          .split(',')
+          .map(Number)
+      } else {
+        this.$message.error('获取商品息失败')
+      }
+    },
+    async getCateList () {
+      const { data: res } = await this.$http.get('categories')
+      if (res.meta.status == 200) {
+        console.log(res.data)
+        this.cateList = res.data
+        console.log(this.cateList)
+      } else {
+        this.$message.error('获取分类失败了')
+      }
+    },
+    handleChange () {
+      console.log(this.editForm.goods_cat)
+      if (this.editForm.goods_cat.length !== 3) {
+        this.editForm.goods_cat = []
+      }
+    },
+    async tabClicked () {
+      console.log(this.currentIndex)
+      if (this.currentIndex === '1') {
+        const { data: res } = await this.$http.get(
+          `categories/${this.editForm.goods_cat[2]}/attributes`,
+          {
+            params: {
+              sel: 'many'
+            }
+          }
+        )
+        if (res.meta.status == 200) {
+          res.data.forEach(item => {
+            item.attr_vals =
 							item.attr_vals.length === 0
-								? []
-								: item.attr_vals.split(' ')
-					})
-					this.manyTableData = res.data
-				} else {
-					this.$message.error('获取动态属性失败了')
-				}
-			} else if (this.currentIndex === '2') {
-				const { data: res } = await this.$http.get(
-					`categories/${this.editForm.goods_cat[2]}/attributes`,
-					{
-						params: {
-							sel: 'only'
-						}
-					}
-				)
-				if (res.meta.status == 200) {
-					this.onlyTableData = res.data
-				} else {
-					this.$message.error('获取动态属性失败了')
-				}
-			}
-        },
-        beforeTabLeave(activeName, oldActiveName) {
-			console.log(activeName)
-			console.log(oldActiveName)
-			if (oldActiveName === '0' && this.editForm.goods_cat.length !== 3) {
-				this.$message.error('请填写商品分类')
-				return false
-			}
-		},
-		handlePreview(file) {
-			this.PreviewPath = file.response.data.url
-			this.visiblePreview = true
-		},
-		handleRemove(file) {
-			console.log(file)
-			const filePath = file.response.data.tmp_path
-			const i = this.editForm.pics.findIndex(x => x.pic === filePath)
-			this.editForm.pics.splice(i, 1)
-			console.log(this.editForm)
-		},
-		handleSuccess(response) {
-			console.log(response)
-			const picInfo = { pic: response.data.tmp_path }
-			this.editForm.pics.push(picInfo)
-			console.log(this.editForm)
-		},
-		edit() {
-			console.log(this.editForm)
-			this.$refs.editFormRef.validate(async vaild => {
-				console.log(vaild)
-				if (vaild) {
-					//lodash cloneDeep(obj)
-                    const form = _.cloneDeep(this.editForm)
+							  ? []
+							  : item.attr_vals.split(' ')
+          })
+          this.manyTableData = res.data
+        } else {
+          this.$message.error('获取动态属性失败了')
+        }
+      } else if (this.currentIndex === '2') {
+        const { data: res } = await this.$http.get(
+          `categories/${this.editForm.goods_cat[2]}/attributes`,
+          {
+            params: {
+              sel: 'only'
+            }
+          }
+        )
+        if (res.meta.status == 200) {
+          this.onlyTableData = res.data
+        } else {
+          this.$message.error('获取动态属性失败了')
+        }
+      }
+    },
+    beforeTabLeave (activeName, oldActiveName) {
+      console.log(activeName)
+      console.log(oldActiveName)
+      if (oldActiveName === '0' && this.editForm.goods_cat.length !== 3) {
+        this.$message.error('请填写商品分类')
+        return false
+      }
+    },
+    handlePreview (file) {
+      this.PreviewPath = file.response.data.url
+      this.visiblePreview = true
+    },
+    handleRemove (file) {
+      console.log(file)
+      const filePath = file.response.data.tmp_path
+      const i = this.editForm.pics.findIndex(x => x.pic === filePath)
+      this.editForm.pics.splice(i, 1)
+      console.log(this.editForm)
+    },
+    handleSuccess (response) {
+      console.log(response)
+      const picInfo = { pic: response.data.tmp_path }
+      this.editForm.pics.push(picInfo)
+      console.log(this.editForm)
+    },
+    edit () {
+      console.log(this.editForm)
+      this.$refs.editFormRef.validate(async vaild => {
+        console.log(vaild)
+        if (vaild) {
+          // lodash cloneDeep(obj)
+          const form = _.cloneDeep(this.editForm)
                     	console.log(form)
-					form.goods_cat = form.goods_cat.join(',')
-					//处理动态参数
-					this.manyTableData.forEach(item => {
-						const newInfo = {
-							attr_id: item.attr_id,
-							attr_value: item.attr_vals.join(' ')
-						}
-						this.editForm.attrs.push(newInfo)
-					})
-					//处理静态参数
-					this.onlyTableData.forEach(item => {
-						const newInfo = {
-							attr_id: item.attr_id,
-							attr_value: item.attr_vals
-						}
-						this.editForm.attrs.push(newInfo)
-					})
-                    form.attrs = this.editForm.attrs
+          form.goods_cat = form.goods_cat.join(',')
+          // 处理动态参数
+          this.manyTableData.forEach(item => {
+            const newInfo = {
+              attr_id: item.attr_id,
+              attr_value: item.attr_vals.join(' ')
+            }
+            this.editForm.attrs.push(newInfo)
+          })
+          // 处理静态参数
+          this.onlyTableData.forEach(item => {
+            const newInfo = {
+              attr_id: item.attr_id,
+              attr_value: item.attr_vals
+            }
+            this.editForm.attrs.push(newInfo)
+          })
+          form.attrs = this.editForm.attrs
                     		console.log(form)
 
-					//发起请求
+          // 发起请求
 
-					const { data: res } = await this.$http.put('goods/'+form.goods_id, {
-                           goods_name:form.goods_name,
-                           goods_cat:form.goods_cat,
-                           goods_price:form.goods_price,
-                           goods_number:form.goods_number,
-                           goods_weight:form.goods_weight,
-                           goods_introduce:form.goods_introduce,
-                           pics:form.pics,
-                           attrs:form.attrs
-                    })
-					if (res.meta.status == 200) {
-						this.$message.success('编辑商品成功了')
-						this.$router.push('/goods')
-					} else {
-						this.$message.error('编辑商品失败了')
-					}
-				} else {
-					return this.$message.error('请填写表单的必填项')
-				}
-			})
-		}
-	}
+          const { data: res } = await this.$http.put('goods/' + form.goods_id, {
+            goods_name: form.goods_name,
+            goods_cat: form.goods_cat,
+            goods_price: form.goods_price,
+            goods_number: form.goods_number,
+            goods_weight: form.goods_weight,
+            goods_introduce: form.goods_introduce,
+            pics: form.pics,
+            attrs: form.attrs
+          })
+          if (res.meta.status == 200) {
+            this.$message.success('编辑商品成功了')
+            this.$router.push('/goods')
+          } else {
+            this.$message.error('编辑商品失败了')
+          }
+        } else {
+          return this.$message.error('请填写表单的必填项')
+        }
+      })
+    }
+  }
 }
 </script>
 <style lang="less" scoped>

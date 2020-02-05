@@ -116,271 +116,271 @@
 </template>
 <script>
 export default {
-	data() {
-		return {
-			cateList: [],
-			manyTableData: [],
-			onlyTableData: [],
-			visible: false,
-			visibleEdit: false,
-			inputVisible: false,
-			inputValue: '',
-			selectedKey: [],
-			activeName: 'many',
-			cascaderProps: {
-				expandTrigger: 'hover',
-				value: 'cat_id',
-				label: 'cat_name',
-				children: 'children'
-			},
-			addForm: {},
-			editForm: {},
-			addFormRules: {
-				attr_name: [
-					{
-						required: true,
-						message: '请输入参数名',
-						trigger: 'blur'
-					}
-				]
-			},
-			editFormRules: {
-				attr_name: [
-					{
-						required: true,
-						message: '请输入参数名',
-						trigger: 'blur'
-					}
-				]
-			}
-		}
-	},
-	computed: {
-		isBtnDisabled() {
-			if (this.selectedKey.length === 3) {
-				return false
-			} else {
-				return true
-			}
-		},
-		cateId() {
-			if (this.selectedKey.length === 3) {
-				return this.selectedKey[2]
-			} else {
-				return null
-			}
-		},
-		titleText() {
-			if (this.activeName === 'many') {
-				return '动态参数'
-			} else {
-				return '静态属性'
-			}
-		}
-	},
+  data () {
+    return {
+      cateList: [],
+      manyTableData: [],
+      onlyTableData: [],
+      visible: false,
+      visibleEdit: false,
+      inputVisible: false,
+      inputValue: '',
+      selectedKey: [],
+      activeName: 'many',
+      cascaderProps: {
+        expandTrigger: 'hover',
+        value: 'cat_id',
+        label: 'cat_name',
+        children: 'children'
+      },
+      addForm: {},
+      editForm: {},
+      addFormRules: {
+        attr_name: [
+          {
+            required: true,
+            message: '请输入参数名',
+            trigger: 'blur'
+          }
+        ]
+      },
+      editFormRules: {
+        attr_name: [
+          {
+            required: true,
+            message: '请输入参数名',
+            trigger: 'blur'
+          }
+        ]
+      }
+    }
+  },
+  computed: {
+    isBtnDisabled () {
+      if (this.selectedKey.length === 3) {
+        return false
+      } else {
+        return true
+      }
+    },
+    cateId () {
+      if (this.selectedKey.length === 3) {
+        return this.selectedKey[2]
+      } else {
+        return null
+      }
+    },
+    titleText () {
+      if (this.activeName === 'many') {
+        return '动态参数'
+      } else {
+        return '静态属性'
+      }
+    }
+  },
 
-	created() {
-		this.getCateList()
-	},
-	methods: {
-		async getCateList() {
-			const { data: res } = await this.$http.get('categories')
-			if (res.meta.status == 200) {
-				console.log(res.data)
-				this.cateList = res.data
-				console.log(this.cateList)
-			} else {
-				this.$message.error('获取分类失败了')
-			}
-		},
+  created () {
+    this.getCateList()
+  },
+  methods: {
+    async getCateList () {
+      const { data: res } = await this.$http.get('categories')
+      if (res.meta.status == 200) {
+        console.log(res.data)
+        this.cateList = res.data
+        console.log(this.cateList)
+      } else {
+        this.$message.error('获取分类失败了')
+      }
+    },
 
-		handleChange() {
-			this.getParamsData()
-			console.log(this.selectedKey)
-			console.log(this.cateId)
-		},
-		handleTabsClick() {
-			this.getParamsData()
-		},
-		async getParamsData() {
-              if(this.selectedKey.length !==3){
-				 this.selectedKey=[]
-				 this.manyTableData=[]
-				 this.onlyTableData=[]
+    handleChange () {
+      this.getParamsData()
+      console.log(this.selectedKey)
+      console.log(this.cateId)
+    },
+    handleTabsClick () {
+      this.getParamsData()
+    },
+    async getParamsData () {
+      if (this.selectedKey.length !== 3) {
+				 this.selectedKey = []
+				 this.manyTableData = []
+				 this.onlyTableData = []
 			  }
 
-			const { data: res } = await this.$http.get(
-				`categories/${this.cateId}/attributes`,
-				{
-					params: {
-						sel: this.activeName
-					}
-				}
-			)
-			console.log(res)
-			res.data.forEach(item => {
-				item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
-				item.inputVisible = false
-				item.inputValue = ''
-			})
-			if (res.meta.status == 200) {
-				console.log(res.data)
-				if (this.activeName === 'many') {
-					this.manyTableData = res.data
-				} else {
-					this.onlyTableData = res.data
-				}
-			} else {
-				this.$message.error('获取参数失败了')
-			}
-		},
-		showAddModal() {
-			this.visible = true
-		},
-		handleOk() {
-			this.$refs.addFormRef.validate(async vaild => {
-				if (vaild) {
-					const { data: res } = await this.$http.post(
-						`categories/${this.cateId}/attributes`,
-						{
-							attr_name: this.addForm.attr_name,
-							attr_sel: this.activeName
-						}
-					)
-					if (res.meta.status == 201) {
-						this.getParamsData()
-						this.$message.success('添加参数信息成功')
-						this.addForm = {}
-					} else {
-						return this.$message.error('添加参数信息失败')
-					}
-					this.visible = false
-				} else {
-					return
-				}
-			})
-		},
-		handleClose() {
-			this.$refs.addFormRef.resetFields()
-		},
-		async showEditModal(id) {
-			const { data: res } = await this.$http.get(
-				`categories/${this.cateId}/attributes/${id}`,
-				{
-					params: {
-						attr_sel: this.activeName
-					}
-				}
-			)
-			if (res.meta.status == 200) {
-				this.editForm = res.data
-			} else {
-				this.$message.error('获取参数信息失败')
-			}
-			this.visibleEdit = true
-		},
-		handleEditOk() {
-			this.$refs.editFormRef.validate(async vaild => {
-				if (vaild) {
-					const { data: res } = await this.$http.put(
-						`categories/${this.cateId}/attributes/${this.editForm.attr_id}`,
-						{
-							attr_name: this.editForm.attr_name,
-							attr_sel: this.activeName
-						}
-					)
-					if (res.meta.status == 200) {
-						this.getParamsData()
-						this.$message.success('编辑参数信息成功')
-					} else {
-						return this.$message.error('编辑参数信息失败')
-					}
-					this.visibleEdit = false
-				} else {
-					return
-				}
-			})
-		},
-		handleEditClose() {
-			this.$refs.editFormRef.resetFields()
-		},
-		async deleteParams(id) {
-			const result = await this.$confirm(
-				'此操作将永久删除该参数, 是否继续?',
-				'删除参数',
-				{
-					confirmButtonText: '确定',
-					cancelButtonText: '取消',
-					type: 'warning'
-				}
-			)
-				.then(async () => {
-					console.log(id)
-					const { data: res } = await this.$http.delete(
-						`categories/${this.cateId}/attributes/${id}`
-					)
-					if (res.meta.status == 200) {
-						this.$message.success('删除参数成功')
-						this.getParamsData()
-					} else {
-						return this.$message.error('删除参数失败')
-					}
-				})
-				.catch(() => {
-					this.$message({
-						type: 'info',
-						message: '已取消删除'
-					})
-				})
-		},
+      const { data: res } = await this.$http.get(
+        `categories/${this.cateId}/attributes`,
+        {
+          params: {
+            sel: this.activeName
+          }
+        }
+      )
+      console.log(res)
+      res.data.forEach(item => {
+        item.attr_vals = item.attr_vals ? item.attr_vals.split(' ') : []
+        item.inputVisible = false
+        item.inputValue = ''
+      })
+      if (res.meta.status == 200) {
+        console.log(res.data)
+        if (this.activeName === 'many') {
+          this.manyTableData = res.data
+        } else {
+          this.onlyTableData = res.data
+        }
+      } else {
+        this.$message.error('获取参数失败了')
+      }
+    },
+    showAddModal () {
+      this.visible = true
+    },
+    handleOk () {
+      this.$refs.addFormRef.validate(async vaild => {
+        if (vaild) {
+          const { data: res } = await this.$http.post(
+            `categories/${this.cateId}/attributes`,
+            {
+              attr_name: this.addForm.attr_name,
+              attr_sel: this.activeName
+            }
+          )
+          if (res.meta.status == 201) {
+            this.getParamsData()
+            this.$message.success('添加参数信息成功')
+            this.addForm = {}
+          } else {
+            return this.$message.error('添加参数信息失败')
+          }
+          this.visible = false
+        } else {
 
-		async handleInputConfirm(row) {
-			if (row.inputValue.trim().length === 0) {
-				row.inputVisible = false
-				row.inputValue = ''
-			} else {
-				row.attr_vals.push(row.inputValue.trim())
-				row.inputVisible = false
-				row.inputValue = ''
-				const { data: res } = await this.$http.put(
-				`categories/${this.cateId}/attributes/${row.attr_id}`,
-				{
-					attr_name: row.attr_name,
-					attr_sel: row.attr_sel,
-					attr_vals: row.attr_vals.join(' ')
-				}
-			)
-			if (res.meta.status == 200) {
-				this.$message.success('修改参数成功了')
-			} else {
-				this.$message.error('修改参数失败了')
-			}
-			}
-		},
-		showInput(row) {
-			row.inputVisible = true
-			//$nextTick 方法作用 就是当页面被重新渲染后 才会指定回调函数中的代码
-			this.$nextTick(_ => {
-				this.$refs.saveTagInput.$refs.input.focus()
-			})
-		},
-		async handleClose(index, row) {
-			row.attr_vals.splice(index, 1)
-			const { data: res } = await this.$http.put(
-				`categories/${this.cateId}/attributes/${row.attr_id}`,
-				{
-					attr_name: row.attr_name,
-					attr_sel: row.attr_sel,
-					attr_vals: row.attr_vals.join(' ')
-				}
-			)
-			if (res.meta.status == 200) {
-				this.$message.success('修改参数成功了')
-			} else {
-				this.$message.error('修改参数失败了')
-			}
-		}
-	}
+        }
+      })
+    },
+    handleClose () {
+      this.$refs.addFormRef.resetFields()
+    },
+    async showEditModal (id) {
+      const { data: res } = await this.$http.get(
+        `categories/${this.cateId}/attributes/${id}`,
+        {
+          params: {
+            attr_sel: this.activeName
+          }
+        }
+      )
+      if (res.meta.status == 200) {
+        this.editForm = res.data
+      } else {
+        this.$message.error('获取参数信息失败')
+      }
+      this.visibleEdit = true
+    },
+    handleEditOk () {
+      this.$refs.editFormRef.validate(async vaild => {
+        if (vaild) {
+          const { data: res } = await this.$http.put(
+            `categories/${this.cateId}/attributes/${this.editForm.attr_id}`,
+            {
+              attr_name: this.editForm.attr_name,
+              attr_sel: this.activeName
+            }
+          )
+          if (res.meta.status == 200) {
+            this.getParamsData()
+            this.$message.success('编辑参数信息成功')
+          } else {
+            return this.$message.error('编辑参数信息失败')
+          }
+          this.visibleEdit = false
+        } else {
+
+        }
+      })
+    },
+    handleEditClose () {
+      this.$refs.editFormRef.resetFields()
+    },
+    async deleteParams (id) {
+      const result = await this.$confirm(
+        '此操作将永久删除该参数, 是否继续?',
+        '删除参数',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      )
+        .then(async () => {
+          console.log(id)
+          const { data: res } = await this.$http.delete(
+            `categories/${this.cateId}/attributes/${id}`
+          )
+          if (res.meta.status == 200) {
+            this.$message.success('删除参数成功')
+            this.getParamsData()
+          } else {
+            return this.$message.error('删除参数失败')
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+    },
+
+    async handleInputConfirm (row) {
+      if (row.inputValue.trim().length === 0) {
+        row.inputVisible = false
+        row.inputValue = ''
+      } else {
+        row.attr_vals.push(row.inputValue.trim())
+        row.inputVisible = false
+        row.inputValue = ''
+        const { data: res } = await this.$http.put(
+          `categories/${this.cateId}/attributes/${row.attr_id}`,
+          {
+            attr_name: row.attr_name,
+            attr_sel: row.attr_sel,
+            attr_vals: row.attr_vals.join(' ')
+          }
+        )
+        if (res.meta.status == 200) {
+          this.$message.success('修改参数成功了')
+        } else {
+          this.$message.error('修改参数失败了')
+        }
+      }
+    },
+    showInput (row) {
+      row.inputVisible = true
+      // $nextTick 方法作用 就是当页面被重新渲染后 才会指定回调函数中的代码
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus()
+      })
+    },
+    async handleClose (index, row) {
+      row.attr_vals.splice(index, 1)
+      const { data: res } = await this.$http.put(
+        `categories/${this.cateId}/attributes/${row.attr_id}`,
+        {
+          attr_name: row.attr_name,
+          attr_sel: row.attr_sel,
+          attr_vals: row.attr_vals.join(' ')
+        }
+      )
+      if (res.meta.status == 200) {
+        this.$message.success('修改参数成功了')
+      } else {
+        this.$message.error('修改参数失败了')
+      }
+    }
+  }
 }
 </script>
 <style lang="less" scoped>

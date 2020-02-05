@@ -124,209 +124,209 @@
 
 <script>
 export default {
-	data() {
-		return {
-			rolesList: [],
-			rightList: [],
-			//默认节点权限id
-			defKey: [],
-			roleId: '',
-			treeProps: {
-				children: 'children',
-				label: 'authName'
-			},
-			visible: false,
-			visibleEdit: false,
-			visiblePemissions: false,
-			addForm: {
-				roleName: '',
-				roleDesc: ''
-			},
-			editForm: {},
-			addFormRules: {
-				roleName: [
-					{
-						required: true,
-						message: '请输入角色名',
-						trigger: 'blur'
-					}
-				]
-			},
-			editFormRules: {
-				roleName: [
-					{
-						required: true,
-						message: '请输入角色名',
-						trigger: 'blur'
-					}
-				]
-			}
-		}
-	},
-	created() {
-		this.getRolesList()
-	},
-	methods: {
-		async getRolesList() {
-			const { data: res } = await this.$http.get('roles')
-			if (res.meta.status == 200) {
-				this.rolesList = res.data
-				console.log(this.rolesList)
-			} else {
-				this.$message.error('获取角色列表失败')
-			}
-		},
-		async deleteRightById(role, rightId, children) {
-			const { data: res } = await this.$http.delete(
-				`roles/${role.id}/rights/${rightId}`
-			)
-			if (res.meta.status == 200) {
-				this.$message.success('删除权限成功了')
-				/* 	this.getRolesList() */
-				role.children = res.data
-			} else {
-				this.$message.error('删除权限失败了')
-			}
-		},
-		showModal() {
-			this.visible = true
-		},
-		async showEditModal(id) {
-			console.log(id)
-			this.visibleEdit = true
-			const { data: res } = await this.$http.get('roles/' + id)
-			if ((res.meta.status = 200)) {
-				this.editForm = res.data
-			} else {
-				this.$message.error('获取角色信息失败')
-			}
-		},
-		async showPermissionsModal(role) {
-			this.roleId = role.id
-			const { data: res } = await this.$http.get('rights/tree')
-			if (res.meta.status == 200) {
-				this.rightList = res.data
-			} else {
-				return this.$message.error('获取权限数据失败了')
-			}
-			this.getLeafKeys(role, this.defKey)
-			this.visiblePemissions = true
-		},
+  data () {
+    return {
+      rolesList: [],
+      rightList: [],
+      // 默认节点权限id
+      defKey: [],
+      roleId: '',
+      treeProps: {
+        children: 'children',
+        label: 'authName'
+      },
+      visible: false,
+      visibleEdit: false,
+      visiblePemissions: false,
+      addForm: {
+        roleName: '',
+        roleDesc: ''
+      },
+      editForm: {},
+      addFormRules: {
+        roleName: [
+          {
+            required: true,
+            message: '请输入角色名',
+            trigger: 'blur'
+          }
+        ]
+      },
+      editFormRules: {
+        roleName: [
+          {
+            required: true,
+            message: '请输入角色名',
+            trigger: 'blur'
+          }
+        ]
+      }
+    }
+  },
+  created () {
+    this.getRolesList()
+  },
+  methods: {
+    async getRolesList () {
+      const { data: res } = await this.$http.get('roles')
+      if (res.meta.status == 200) {
+        this.rolesList = res.data
+        console.log(this.rolesList)
+      } else {
+        this.$message.error('获取角色列表失败')
+      }
+    },
+    async deleteRightById (role, rightId, children) {
+      const { data: res } = await this.$http.delete(
+        `roles/${role.id}/rights/${rightId}`
+      )
+      if (res.meta.status == 200) {
+        this.$message.success('删除权限成功了')
+        /* 	this.getRolesList() */
+        role.children = res.data
+      } else {
+        this.$message.error('删除权限失败了')
+      }
+    },
+    showModal () {
+      this.visible = true
+    },
+    async showEditModal (id) {
+      console.log(id)
+      this.visibleEdit = true
+      const { data: res } = await this.$http.get('roles/' + id)
+      if ((res.meta.status = 200)) {
+        this.editForm = res.data
+      } else {
+        this.$message.error('获取角色信息失败')
+      }
+    },
+    async showPermissionsModal (role) {
+      this.roleId = role.id
+      const { data: res } = await this.$http.get('rights/tree')
+      if (res.meta.status == 200) {
+        this.rightList = res.data
+      } else {
+        return this.$message.error('获取权限数据失败了')
+      }
+      this.getLeafKeys(role, this.defKey)
+      this.visiblePemissions = true
+    },
 
-		handleClose() {
-			this.$refs.addFormRef.resetFields()
-		},
-		handleEditClose() {
-			this.$refs.editFormRef.resetFields()
-		},
-		handlePemissionsClose() {
-			this.defKey = []
-		},
-		handleOk() {
-			this.$refs.addFormRef.validate(async vaild => {
-				console.log(vaild)
-				if (vaild) {
-					//发起添加角色的请求
-					const { data: res } = await this.$http.post(
-						'roles',
-						this.addForm
-					)
-					if (res.meta.status == 201) {
-						this.$message.success('添加角色成功了')
-						this.visible = false
-						this.getRolesList()
-						this.$refs.addFormRef.resetFields()
-					} else {
-						this.$message.error('添加角色失败了')
-					}
-				} else {
-					return
-				}
-			})
-		},
-		handleEditOk() {
-			this.$refs.editFormRef.validate(async vaild => {
-				if (vaild) {
-					const { data: res } = await this.$http.put(
-						'roles/' + this.editForm.roleId,
-						{
-							roleName: this.editForm.roleName,
-							roleDesc: this.editForm.roleDesc
-						}
-					)
-					if (res.meta.status == 200) {
-						this.getRolesList()
-						this.$message.success('更新角色信息成功')
-					} else {
-						return this.$message.error('更新角色信息失败')
-					}
-				} else {
-					return
-				}
-				this.visibleEdit = false
-			})
-		},
-		async handlePemissionsOk() {
-			const keys = [
-				...this.$refs.treeRef.getCheckedKeys(),
-				...this.$refs.treeRef.getHalfCheckedKeys()
-			]
-			console.log(keys)
-			const idStr = keys.join(',')
+    handleClose () {
+      this.$refs.addFormRef.resetFields()
+    },
+    handleEditClose () {
+      this.$refs.editFormRef.resetFields()
+    },
+    handlePemissionsClose () {
+      this.defKey = []
+    },
+    handleOk () {
+      this.$refs.addFormRef.validate(async vaild => {
+        console.log(vaild)
+        if (vaild) {
+          // 发起添加角色的请求
+          const { data: res } = await this.$http.post(
+            'roles',
+            this.addForm
+          )
+          if (res.meta.status == 201) {
+            this.$message.success('添加角色成功了')
+            this.visible = false
+            this.getRolesList()
+            this.$refs.addFormRef.resetFields()
+          } else {
+            this.$message.error('添加角色失败了')
+          }
+        } else {
 
-			const { data: res } = await this.$http.post(
-				`roles/${this.roleId}/rights`,
-				{
-					rids: idStr
-				}
-			)
-			if (res.meta.status == 200) {
-				this.$message.success('分配权限成功')
-				this.getRolesList()
-			} else {
-				this.$message.error('分配权限失败')
-			}
-			this.visiblePemissions = false
-			this.defKey = []
-		},
-		async deleteRole(id) {
-			const result = await this.$confirm(
-				'此操作将永久删除该角色, 是否继续?',
-				'删除用户',
-				{
-					confirmButtonText: '确定',
-					cancelButtonText: '取消',
-					type: 'warning'
-				}
-			)
-				.then(async () => {
-					console.log(id)
-					const { data: res } = await this.$http.delete('roles/' + id)
-					if (res.meta.status == 200) {
-						this.$message.success('删除角色成功')
-						this.getRolesList()
-					} else {
-						return this.$message.error('删除角色失败')
-					}
-				})
-				.catch(() => {
-					this.$message({
-						type: 'info',
-						message: '已取消删除'
-					})
-				})
-		},
-		//递归的获取角色下所有三级权限的id 保存到defkeys数组中
-		getLeafKeys(node, arr) {
-			//当前节点不包含children属性
-			if (!node.children) {
-				return arr.push(node.id)
-			}
-			node.children.forEach(item => {
-				this.getLeafKeys(item, arr)
-			})
-		}
-	}
+        }
+      })
+    },
+    handleEditOk () {
+      this.$refs.editFormRef.validate(async vaild => {
+        if (vaild) {
+          const { data: res } = await this.$http.put(
+            'roles/' + this.editForm.roleId,
+            {
+              roleName: this.editForm.roleName,
+              roleDesc: this.editForm.roleDesc
+            }
+          )
+          if (res.meta.status == 200) {
+            this.getRolesList()
+            this.$message.success('更新角色信息成功')
+          } else {
+            return this.$message.error('更新角色信息失败')
+          }
+        } else {
+          return
+        }
+        this.visibleEdit = false
+      })
+    },
+    async handlePemissionsOk () {
+      const keys = [
+        ...this.$refs.treeRef.getCheckedKeys(),
+        ...this.$refs.treeRef.getHalfCheckedKeys()
+      ]
+      console.log(keys)
+      const idStr = keys.join(',')
+
+      const { data: res } = await this.$http.post(
+        `roles/${this.roleId}/rights`,
+        {
+          rids: idStr
+        }
+      )
+      if (res.meta.status == 200) {
+        this.$message.success('分配权限成功')
+        this.getRolesList()
+      } else {
+        this.$message.error('分配权限失败')
+      }
+      this.visiblePemissions = false
+      this.defKey = []
+    },
+    async deleteRole (id) {
+      const result = await this.$confirm(
+        '此操作将永久删除该角色, 是否继续?',
+        '删除用户',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      )
+        .then(async () => {
+          console.log(id)
+          const { data: res } = await this.$http.delete('roles/' + id)
+          if (res.meta.status == 200) {
+            this.$message.success('删除角色成功')
+            this.getRolesList()
+          } else {
+            return this.$message.error('删除角色失败')
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+    },
+    // 递归的获取角色下所有三级权限的id 保存到defkeys数组中
+    getLeafKeys (node, arr) {
+      // 当前节点不包含children属性
+      if (!node.children) {
+        return arr.push(node.id)
+      }
+      node.children.forEach(item => {
+        this.getLeafKeys(item, arr)
+      })
+    }
+  }
 }
 </script>
 
